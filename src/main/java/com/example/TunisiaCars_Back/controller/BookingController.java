@@ -2,13 +2,17 @@ package com.example.TunisiaCars_Back.controller;
 
 
 import com.example.TunisiaCars_Back.entity.Booking;
+import com.example.TunisiaCars_Back.entity.Status;
 import com.example.TunisiaCars_Back.service.BookingService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -60,5 +64,27 @@ public class BookingController {
         return ResponseEntity.ok(updatedBooking);
     }
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateStatus(
+            @PathVariable String id,
+            @RequestBody Map<String, String> body
+    ) {
+        String statusStr = body.get("status");
+        if (statusStr == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
+        try {
+            // Convertir en minuscules avant de faire valueOf (car enum en minuscules)
+            Status status = Status.valueOf(statusStr.toLowerCase());
+            bookingService.updateStatus(id, status.name());
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            // Mauvais status reçu (pas dans l'enum)
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
+

@@ -30,8 +30,6 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
 
     private String createdAt;
 
